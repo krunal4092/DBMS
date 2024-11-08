@@ -1,0 +1,47 @@
+use LibraryDB;
+
+db.createCollection("books");
+
+db.books.insertMany([
+  { title: "MongoDB Basics", description: "Introduction to MongoDB", by: "John", url: "http://example.com/mongodb", tags: ["database", "NoSQL"], likes: 150 },
+  { title: "NoSQL Overview", description: "Overview of NoSQL databases", by: "Alice", url: "http://example.com/nosql", tags: ["database", "NoSQL"], likes: 120 },
+  { title: "Data Modeling", description: "Designing schemas in MongoDB", by: "John", url: "http://example.com/data_modeling", tags: ["database", "NoSQL", "modeling"], likes: 90 },
+  { title: "Advanced MongoDB", description: "In-depth MongoDB concepts", by: "Bob", url: "http://example.com/advanced_mongodb", tags: ["database", "NoSQL", "advanced"], likes: 200 },
+  { title: "MongoDB for Developers", description: "Development best practices", by: "John", url: "http://example.com/mongodb_devs", tags: ["database", "NoSQL"], likes: 300 }
+]);
+
+db.books.insertOne({
+  title: "MongoDB Overview",
+  description: "Detailed overview of MongoDB",
+  by: "John",
+  url: "http://example.com/mongodb_overview",
+  tags: ["database", "NoSQL"],
+  likes: 180,
+  username: "john_doe",
+  comments: "Great resource for MongoDB!"
+});
+
+db.books.find({ $or: [{ by: "John" }, { title: "mongodb" }] });
+
+db.books.find({ likes: { $gt: 150 } });
+
+db.books.updateOne({ title: "mongodb" }, { $set: { title: "mongodb overview" } });
+
+db.books.find({ by: "John" }).limit(2);
+
+db.books.find().sort({ title: 1 });
+
+print("Documents by 'John' or with title 'mongodb':");
+printjson(db.books.find({ $or: [{ by: "John" }, { title: "mongodb" }] }).toArray());
+
+print("Documents with likes greater than 150:");
+printjson(db.books.find({ likes: { $gt: 150 } }).toArray());
+
+print("Updating title 'mongodb' to 'mongodb overview':");
+db.books.updateOne({ title: "mongodb" }, { $set: { title: "mongodb overview" } });
+
+print("Two documents written by 'John':");
+printjson(db.books.find({ by: "John" }).limit(2).toArray());
+
+print("All books sorted by title:");
+printjson(db.books.find().sort({ title: 1 }).toArray());

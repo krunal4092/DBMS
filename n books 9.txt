@@ -1,0 +1,63 @@
+-- Step 1: Create the Library database
+CREATE DATABASE Library;
+
+-- Use the Library database
+USE Library;
+
+-- Step 2: Create the Books table
+CREATE TABLE Books (
+    AccNo INT PRIMARY KEY,
+    Title VARCHAR(255) NOT NULL,
+    Author VARCHAR(255) NOT NULL,
+    Publisher VARCHAR(255),
+    Count INT
+);
+
+-- Step 3: Create the Library_Audit table
+-- This table will store records of deletions and updates with action details
+CREATE TABLE Library_Audit (
+    AccNo INT,
+    Title VARCHAR(255),
+    Author VARCHAR(255),
+    Publisher VARCHAR(255),
+    Count INT,
+    ActionType VARCHAR(10),
+    ActionDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Step 4: Create a trigger to log deletions in Library_Audit before deleting from Books
+DELIMITER //
+CREATE TRIGGER before_delete_books
+BEFORE DELETE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, ActionType)
+    VALUES (OLD.AccNo, OLD.Title, OLD.Author, OLD.Publisher, OLD.Count, 'DELETE');
+END //
+DELIMITER ;
+
+-- Step 5: Create a trigger to log updates in Library_Audit after updating Books
+DELIMITER //
+CREATE TRIGGER after_update_books
+AFTER UPDATE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, ActionType)
+    VALUES (NEW.AccNo, NEW.Title, NEW.Author, NEW.Publisher, NEW.Count, 'UPDATE');
+END //
+DELIMITER ;
+
+-- Step 6: Insert sample data into the Books table
+INSERT INTO Books (AccNo, Title, Author, Publisher, Count) VALUES
+(1, 'The Great Gatsby', 'F. Scott Fitzgerald', 'Scribner', 3),
+(2, '1984', 'George Orwell', 'Secker & Warburg', 5),
+(3, 'To Kill a Mockingbird', 'Harper Lee', 'J.B. Lippincott & Co.', 2);
+
+-- Step 7: Update a record in Books to trigger the after_update_books trigger
+UPDATE Books SET Count = 4 WHERE AccNo = 1;
+
+-- Step 8: Delete a record from Books to trigger the before_delete_books trigger
+DELETE FROM Books WHERE AccNo = 2;
+
+-- Step 9: Check the Library_Audit table for logs of deletions and updates
+SELECT * FROM Library_Audit;

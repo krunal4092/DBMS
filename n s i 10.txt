@@ -1,0 +1,109 @@
+CREATE DATABASE db;
+
+USE db;
+
+-- Step 1: Create the Student and Instructor tables
+CREATE TABLE Student (
+    Student_Id INT PRIMARY KEY,
+    Student_Name VARCHAR(100),
+    Instructor_Id INT,   -- Foreign key referencing Instructor
+    Student_City VARCHAR(100)
+);
+
+CREATE TABLE Instructor (
+    Instructor_Id INT PRIMARY KEY,
+    Instructor_Name VARCHAR(100),
+    Instructor_City VARCHAR(100),
+    Specialization VARCHAR(100)
+);
+
+-- Step 2: Insert sample data into the tables
+INSERT INTO Instructor (Instructor_Id, Instructor_Name, Instructor_City, Specialization) VALUES
+(1, 'Dr. Smith', 'Pune', 'Computer'),
+(2, 'Dr. Johnson', 'Mumbai', 'Mathematics'),
+(3, 'Dr. Williams', 'Pune', 'Physics'),
+(4, 'Dr. Brown', 'Delhi', 'Computer');
+
+INSERT INTO Student (Student_Id, Student_Name, Instructor_Id, Student_City) VALUES
+(101, 'Alice', 1, 'Pune'),
+(102, 'Bob', 2, 'Mumbai'),
+(103, 'Charlie', NULL, 'Delhi'),   -- Student without an instructor
+(104, 'David', 3, 'Pune'),
+(105, 'Eve', 4, 'Pune');
+
+-- Requirement 1: Find the instructor of each student
+SELECT 
+    Student.Student_Id,
+    Student.Student_Name,
+    Instructor.Instructor_Name AS Instructor
+FROM 
+    Student
+JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id;
+
+-- Requirement 2: Find the student who is not having any instructor
+SELECT 
+    Student_Id,
+    Student_Name
+FROM 
+    Student
+LEFT JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Instructor_Id IS NULL;
+
+-- Requirement 3: Find students without an instructor and instructors without students
+-- Students without an instructor
+SELECT 
+    Student_Id AS ID,
+    Student_Name AS Name,
+    'Student' AS Type
+FROM 
+    Student
+LEFT JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Instructor_Id IS NULL
+
+UNION
+
+-- Instructors without any students
+SELECT 
+    Instructor_Id AS ID,
+    Instructor_Name AS Name,
+    'Instructor' AS Type
+FROM 
+    Instructor
+LEFT JOIN 
+    Student ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Student.Student_Id IS NULL;
+
+-- Requirement 4: Find students whose instructor’s specialization is "Computer"
+SELECT 
+    Student.Student_Id,
+    Student.Student_Name,
+    Instructor.Instructor_Name AS Instructor
+FROM 
+    Student
+JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Specialization = 'Computer';
+
+-- Requirement 5: Create a view for the total number of students whose instructor belongs to "Pune"
+CREATE VIEW Pune_Student_Count AS
+SELECT 
+    Instructor.Instructor_City,
+    COUNT(Student.Student_Id) AS Total_Students
+FROM 
+    Student
+JOIN 
+    Instructor ON Student.Instructor_Id = Instructor.Instructor_Id
+WHERE 
+    Instructor.Instructor_City = 'Pune'
+GROUP BY 
+    Instructor.Instructor_City;
+
+-- Query to view the result of the Pune_Student_Count view
+SELECT * FROM Pune_Student_Count;

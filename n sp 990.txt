@@ -1,0 +1,69 @@
+CREATE DATABASE db;
+
+USE db;
+
+-- Step 1: Create Stud_Marks table
+CREATE TABLE Stud_Marks (
+    name VARCHAR(100) NOT NULL,
+    total_marks INT NOT NULL
+);
+
+-- Step 2: Insert sample data into Stud_Marks
+INSERT INTO Stud_Marks (name, total_marks) VALUES
+('John Doe', 1200),
+('Jane Smith', 950),
+('Alice Johnson', 850),
+('Bob Brown', 780);
+
+-- Step 3: Create Result table with Roll as AUTO_INCREMENT primary key
+CREATE TABLE Result (
+    Roll INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(100) NOT NULL,
+    Class VARCHAR(50) NOT NULL
+);
+
+-- Step 4: Create the stored procedure proc_Grade
+DELIMITER //
+CREATE PROCEDURE proc_Grade()
+BEGIN
+    DECLARE v_Name VARCHAR(100);
+    DECLARE v_Marks INT;
+    DECLARE v_Class VARCHAR(50);
+    DECLARE done INT DEFAULT FALSE;
+
+    DECLARE cur CURSOR FOR SELECT name, total_marks FROM Stud_Marks;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+
+    read_loop: LOOP
+        FETCH cur INTO v_Name, v_Marks;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Determine class based on marks
+        IF v_Marks BETWEEN 990 AND 1500 THEN
+            SET v_Class = 'Distinction';
+        ELSEIF v_Marks BETWEEN 900 AND 989 THEN
+            SET v_Class = 'First Class';
+        ELSEIF v_Marks BETWEEN 825 AND 899 THEN
+            SET v_Class = 'Higher Second Class';
+        ELSE
+            SET v_Class = 'Fail';
+        END IF;
+
+        -- Insert result without specifying Roll, letting it auto-increment
+        INSERT INTO Result (Name, Class)
+        VALUES (v_Name, v_Class);
+    END LOOP;
+
+    CLOSE cur;
+END //
+DELIMITER ;
+
+-- Step 5: Execute the stored procedure to populate Result table
+CALL proc_Grade();
+
+-- Step 6: Display data from Result table to verify insertion
+SELECT * FROM Result;

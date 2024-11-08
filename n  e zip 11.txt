@@ -1,0 +1,37 @@
+CREATE DATABASE CompanyDB;
+
+USE CompanyDB;
+
+CREATE TABLE Employee (
+    Emp_No INT PRIMARY KEY,
+    Emp_Name VARCHAR(100),
+    Designation VARCHAR(100),
+    City VARCHAR(100),
+    Salary DECIMAL(10, 2),
+    Zipcode VARCHAR(20),
+    County VARCHAR(20)
+);
+
+INSERT INTO Employee (Emp_No, Emp_Name, Designation, City, Salary, Zipcode, County) VALUES 
+(1, 'Alice', 'Manager', 'Mumbai', 55000, '400001', '071'),
+(2, 'Bob', 'Engineer', 'Pune', 45000, '411001', '072'),
+(3, 'Charlie', 'Analyst', 'Delhi', 40000, '110001', '073'),
+(4, 'David', 'Developer', 'Mumbai', 35000, '400002', '071'),
+(5, 'Eve', 'Consultant', 'Bangalore', 60000, '560001', '074');
+
+CREATE SEQUENCE empno_seq
+START WITH 1
+INCREMENT BY 1
+MINVALUE 1
+NOCYCLE;
+
+CREATE INDEX idx_county ON Employee(County);
+
+SELECT Zipcode
+FROM Employee
+WHERE County = '071';
+
+CREATE VIEW Mumbai_Employees AS
+SELECT Emp_No, Emp_Name, Designation, City, Salary, Zipcode, County
+FROM Employee
+WHERE Salary < 50000 AND City = 'Mumbai';

@@ -1,0 +1,80 @@
+CREATE DATABASE CompanyDB;
+
+USE CompanyDB;
+
+CREATE TABLE employee (
+    employee_name VARCHAR(100),
+    street VARCHAR(100),
+    city VARCHAR(100)
+);
+
+CREATE TABLE works (
+    employee_name VARCHAR(100),
+    company_name VARCHAR(100),
+    salary DECIMAL(10, 2)
+);
+
+CREATE TABLE company (
+    company_name VARCHAR(100),
+    city VARCHAR(100)
+);
+
+CREATE TABLE manages (
+    employee_name VARCHAR(100),
+    manager_name VARCHAR(100)
+);
+
+INSERT INTO employee (employee_name, street, city) VALUES 
+('Alice', '123 Elm St', 'Pune'),
+('Bob', '456 Oak St', 'Mumbai'),
+('Charlie', '789 Pine St', 'Bangalore'),
+('David', '101 Maple St', 'Chennai'),
+('Eve', '202 Birch St', 'Delhi');
+
+INSERT INTO works (employee_name, company_name, salary) VALUES 
+('Alice', 'First Bank Corporation', 15000),
+('Bob', 'Small Bank Corporation', 12000),
+('Charlie', 'First Bank Corporation', 9000),
+('David', 'Big Bank Ltd', 35000),
+('Eve', 'First Bank Corporation', 60000);
+
+INSERT INTO company (company_name, city) VALUES 
+('First Bank Corporation', 'Pune'),
+('Small Bank Corporation', 'Bangalore'),
+('Big Bank Ltd', 'Chennai'),
+('XYZ Bank', 'Mumbai');
+
+INSERT INTO manages (employee_name, manager_name) VALUES 
+('Alice', 'Eve'),
+('Bob', 'David'),
+('Charlie', 'Alice');
+
+SELECT employee_name 
+FROM works
+WHERE company_name = 'First Bank Corporation';
+
+SELECT employee_name, street, city 
+FROM employee
+JOIN works ON employee.employee_name = works.employee_name
+WHERE works.company_name = 'First Bank Corporation' AND works.salary > 10000;
+
+SELECT employee_name, street, city
+FROM employee e
+JOIN works w ON e.employee_name = w.employee_name
+JOIN manages m ON e.employee_name = m.employee_name
+JOIN employee mngr ON m.manager_name = mngr.employee_name
+WHERE e.city = mngr.city AND e.street = mngr.street;
+
+SELECT employee_name
+FROM works w1
+WHERE w1.salary > ALL (SELECT salary FROM works w2 WHERE w2.company_name = 'Small Bank Corporation');
+
+SELECT employee_name
+FROM works w1
+WHERE w1.salary > (SELECT AVG(salary) FROM works w2 WHERE w2.company_name = w1.company_name);
+
+SELECT company_name
+FROM works
+GROUP BY company_name
+ORDER BY SUM(salary) ASC
+LIMIT 1;

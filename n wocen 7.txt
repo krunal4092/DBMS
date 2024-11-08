@@ -1,0 +1,41 @@
+CREATE DATABASE db;
+
+USE db;
+
+-- Creating WorkCenters table
+CREATE TABLE WorkCenters (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    capacity INT NOT NULL
+);
+
+-- Creating WorkCenterStats table to track total capacity
+CREATE TABLE WorkCenterStats (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    total_capacity INT DEFAULT 0
+);
+
+-- Insert an initial row in WorkCenterStats to hold the total capacity
+INSERT INTO WorkCenterStats (total_capacity) VALUES (0);
+
+DELIMITER //
+
+CREATE TRIGGER trg_after_insert_WorkCenters
+AFTER INSERT ON WorkCenters
+FOR EACH ROW
+BEGIN
+    -- Update the total capacity in WorkCenterStats
+    UPDATE WorkCenterStats
+    SET total_capacity = total_capacity + NEW.capacity;
+END //
+
+DELIMITER ;
+
+-- Insert sample data into WorkCenters
+INSERT INTO WorkCenters (name, capacity) VALUES
+('Assembly Line A', 100),
+('Assembly Line B', 150),
+('Assembly Line C', 200);
+
+-- Check the total capacity in WorkCenterStats
+SELECT * FROM WorkCenterStats;

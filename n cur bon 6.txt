@@ -1,0 +1,54 @@
+create database company;
+
+use company;
+
+CREATE TABLE emp (
+    eno INT PRIMARY KEY,
+    name VARCHAR(100),
+    city VARCHAR(100),
+    salary INT
+);
+
+INSERT INTO emp (eno, name, city, salary) VALUES
+(101, 'John Doe', 'New York', 3500),
+(102, 'Jane Smith', 'Los Angeles', 4500),
+(103, 'Alice Brown', 'Chicago', 3000),
+(104, 'Bob White', 'Houston', 5000),
+(105, 'Charlie Green', 'Phoenix', 4200);
+
+DELIMITER //
+
+CREATE PROCEDURE sal_cur()
+BEGIN
+    DECLARE var_eno INT;
+    DECLARE var_sal INT;
+    DECLARE exit_loop BOOLEAN;
+
+    DECLARE c1 CURSOR FOR SELECT eno, salary FROM emp;
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET exit_loop = TRUE;
+
+    OPEN c1;
+
+    emp_loop: LOOP
+        FETCH c1 INTO var_eno, var_sal;
+
+        IF var_sal > 4000 THEN
+            UPDATE emp SET salary = var_sal + 5000 WHERE eno = var_eno;
+        ELSE
+            UPDATE emp SET salary = var_sal + 1000 WHERE eno = var_eno;
+        END IF;
+
+        IF exit_loop THEN
+            CLOSE c1;
+            LEAVE emp_loop;
+        END IF;
+
+    END LOOP emp_loop;
+END //
+
+DELIMITER ;
+
+CALL sal_cur();
+
+SELECT * FROM emp;

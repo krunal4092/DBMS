@@ -1,0 +1,100 @@
+CREATE DATABASE db;
+
+USE db;
+
+-- Create Student table with AUTO_INCREMENT on StudID
+CREATE TABLE Student (
+    StudID INT NOT NULL AUTO_INCREMENT,
+    Name VARCHAR(50) NOT NULL,
+    Address VARCHAR(100) NOT NULL,
+    Marks INT NOT NULL,
+    Grade VARCHAR(20),
+    PRIMARY KEY (StudID)
+);
+
+-- Insert sample data into Student table
+INSERT INTO Student (Name, Address, Marks, Grade) VALUES
+('John Doe', '123 Main St', 85, 'Distinction'),
+('Jane Smith', '456 Oak St', 90, 'First Class'),
+('Mike Johnson', '789 Pine St', 78, 'Second Class');
+
+
+-- 2. Create Employee table
+CREATE TABLE Employee (
+    EmployeeID INT NOT NULL,
+    Name VARCHAR(50) NOT NULL,
+    Address VARCHAR(100) NOT NULL,
+    Salary DECIMAL(10, 2) NOT NULL,
+    DateOfJoining DATE NOT NULL,
+    Department VARCHAR(50) NOT NULL,
+    PRIMARY KEY (EmployeeID)
+);
+
+-- Insert sample data into Employee table
+INSERT INTO Employee (EmployeeID, Name, Address, Salary, DateOfJoining, Department) VALUES
+(1, 'Alice Brown', '100 First Ave', 50000, '2020-01-15', 'HR'),
+(2, 'Bob White', '200 Second St', 55000, '2019-03-22', 'Finance'),
+(3, 'Charlie Green', '300 Third Rd', 40000, '2021-06-10', 'IT');
+
+-- 3. Create Weather table
+CREATE TABLE Weather (
+    CityID INT NOT NULL,
+    CityName VARCHAR(50) NOT NULL,
+    MinTemp DECIMAL(5, 2) NOT NULL,
+    MaxTemp DECIMAL(5, 2) NOT NULL,
+    PRIMARY KEY (CityID)
+);
+
+-- Insert sample data into Weather table
+INSERT INTO Weather (CityID, CityName, MinTemp, MaxTemp) VALUES
+(1, 'New York', -5.0, 30.0),
+(2, 'Los Angeles', 10.0, 35.0),
+(3, 'Chicago', -10.0, 25.0);
+
+-- 4. Alter Student and Employee tables to add NOT NULL constraints (already applied in table creation above).
+
+-- 5. Create JoiningInfo view on Employee table
+CREATE VIEW JoiningInfo AS
+SELECT EmployeeID, Name, DateOfJoining FROM Employee;
+
+-- 6. Create index on primary key columns of all tables
+CREATE INDEX idx_student_studid ON Student(StudID);
+CREATE INDEX idx_employee_employeeid ON Employee(EmployeeID);
+CREATE INDEX idx_weather_cityid ON Weather(CityID);
+
+-- 7. Create MarksInfo view on Student table
+CREATE VIEW MarksInfo AS
+SELECT StudID, Marks FROM Student;
+
+-- 8. Rename Weather table to WeatherData
+ALTER TABLE Weather RENAME TO WeatherData;
+
+-- 9. Drop CityName column from WeatherData
+ALTER TABLE WeatherData DROP COLUMN CityName;
+
+-- Step 1: Check if the 'Grade' column exists in 'Student' table
+SELECT COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Student' AND COLUMN_NAME = 'Grade';
+
+-- Step 2: If the above query returns a row, proceed to drop the column
+-- Drop the Grade column if it exists
+ALTER TABLE Student DROP COLUMN Grade;
+
+-- Step 3: Now add the Grade column (this will only execute if the column was successfully dropped or didn’t exist)
+ALTER TABLE Student ADD Grade VARCHAR(20);
+
+-- 11. Create DistinctionStudents view displaying data of students with Distinction as Grade
+CREATE VIEW DistinctionStudents AS
+SELECT * FROM Student WHERE Grade = 'Distinction';
+
+-- Drop view if it exists to avoid conflicts
+DROP VIEW IF EXISTS Emp_Info;
+
+-- Create a view named Emp_Info as an alias for the Employee table
+CREATE VIEW Emp_Info AS
+SELECT * FROM Employee;
+
+SELECT * FROM Student;
+
+SELECT * FROM Employee;

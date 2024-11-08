@@ -1,0 +1,49 @@
+use LibraryDB;
+
+db.createCollection("books");
+
+db.books.insertMany([
+  { title: "MongoDB Basics", description: "Intro to MongoDB", author: "John", url: "http://example.com/mongodb", tags: ["database", "NoSQL"], likes: 150 },
+  { title: "NoSQL Overview", description: "Basics of NoSQL", author: "John", url: "http://example.com/nosql", tags: ["database", "NoSQL"], likes: 200 },
+  { title: "Advanced MongoDB", description: "Deep dive into MongoDB", author: "Jane", url: "http://example.com/advanced_mongodb", tags: ["database", "NoSQL", "advanced"], likes: 300 },
+  { title: "Data Modeling", description: "Data structures in MongoDB", author: "John", url: "http://example.com/data_modeling", tags: ["database", "NoSQL"], likes: 100 },
+  { title: "MongoDB for Developers", description: "MongoDB development practices", author: "Alice", url: "http://example.com/mongodb_devs", tags: ["database", "NoSQL"], likes: 400 }
+]);
+
+db.books.aggregate([
+  { $match: { author: "John" } },
+  { $count: "num_books_by_john" }
+]);
+
+db.books.aggregate([
+  { $match: { author: "John" } },
+  { $group: { _id: null, minLikes: { $min: "$likes" }, maxLikes: { $max: "$likes" } } }
+]);
+
+db.books.aggregate([
+  { $match: { author: "John" } },
+  { $group: { _id: null, avgLikes: { $avg: "$likes" } } }
+]);
+
+db.books.aggregate([
+  { $match: { author: "John" } },
+  { $sort: { _id: 1 } },
+  { $group: { _id: null, firstBook: { $first: "$title" }, lastBook: { $last: "$title" } } }
+]);
+
+db.books.createIndex({ author: 1 });
+
+print("Number of books published by author John:");
+printjson(db.books.aggregate([{ $match: { author: "John" } }, { $count: "num_books_by_john" }]).toArray());
+
+print("Books with minimum and maximum likes by author John:");
+printjson(db.books.aggregate([{ $match: { author: "John" } }, { $group: { _id: null, minLikes: { $min: "$likes" }, maxLikes: { $max: "$likes" } } }]).toArray());
+
+print("Average likes of books by author John:");
+printjson(db.books.aggregate([{ $match: { author: "John" } }, { $group: { _id: null, avgLikes: { $avg: "$likes" } } }]).toArray());
+
+print("First and last book by author John:");
+printjson(db.books.aggregate([{ $match: { author: "John" } }, { $sort: { _id: 1 } }, { $group: { _id: null, firstBook: { $first: "$title" }, lastBook: { $last: "$title" } } }]).toArray());
+
+print("Books by author John (using index):");
+printjson(db.books.find({ author: "John" }).explain("executionStats"));

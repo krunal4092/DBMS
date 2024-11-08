@@ -1,0 +1,73 @@
+db.createCollection("books");
+
+db.books.insertMany([
+    {
+        TITLE: "MongoDB Basics",
+        DESCRIPTION: "An introduction to MongoDB and its features.",
+        BY: "john",
+        URL: "http://mongodb.com/basics",
+        TAGS: ["NoSQL", "Database", "MongoDB"],
+        LIKES: 120
+    },
+    {
+        TITLE: "Learning MongoDB",
+        DESCRIPTION: "A comprehensive guide to MongoDB.",
+        BY: "alice",
+        URL: "http://mongodb.com/learning",
+        TAGS: ["MongoDB", "NoSQL", "Learning"],
+        LIKES: 200
+    },
+    {
+        TITLE: "Advanced MongoDB",
+        DESCRIPTION: "Exploring advanced MongoDB features and optimization.",
+        BY: "john",
+        URL: "http://mongodb.com/advanced",
+        TAGS: ["Database", "MongoDB", "Optimization"],
+        LIKES: 180
+    },
+    {
+        TITLE: "MongoDB for Developers",
+        DESCRIPTION: "A developer's guide to MongoDB.",
+        BY: "bob",
+        URL: "http://mongodb.com/developers",
+        TAGS: ["MongoDB", "Development", "Database"],
+        LIKES: 150
+    },
+    {
+        TITLE: "MongoDB in Production",
+        DESCRIPTION: "Best practices for using MongoDB in production environments.",
+        BY: "alice",
+        URL: "http://mongodb.com/production",
+        TAGS: ["MongoDB", "Production", "Best Practices"],
+        LIKES: 250
+    }
+]);
+
+db.books.insertOne({
+    TITLE: "MongoDB Security",
+    DESCRIPTION: "A guide to securing your MongoDB instances.",
+    BY: "john",
+    URL: "http://mongodb.com/security",
+    TAGS: ["MongoDB", "Security", "Database"],
+    LIKES: 300,
+    USERNAME: "mike",
+    COMMENTS: "Great security tips!"
+});
+
+db.books.find({
+    $or: [
+        { BY: "john" },
+        { TITLE: "mongodb" }
+    ]
+}).pretty();
+
+db.books.find({ LIKES: { $gt: 150 } }).pretty();
+
+db.books.updateOne(
+    { TITLE: "mongodb" },
+    { $set: { TITLE: "mongodb overview" } }
+);
+
+db.books.find({ BY: "john" }).limit(2).pretty();
+
+db.books.find().sort({ TITLE: 1 }).pretty();

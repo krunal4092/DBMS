@@ -1,0 +1,74 @@
+CREATE DATABASE LibraryDB;
+
+USE LibraryDB;
+
+ -- Create Borrower Table
+mysql> CREATE TABLE Borrower (
+Roll_no INT PRIMARY KEY,
+Name VARCHAR(100),
+DateofIssue DATE,
+NameofBook VARCHAR(255),
+Status CHAR(1)
+);
+
+ -- Create Fine Table
+CREATE TABLE Fine (
+Roll_no INT,
+Date DATE,
+Amt DECIMAL(10, 2),
+FOREIGN KEY (Roll_no) REFERENCES Borrower(Roll_no)
+);
+
+INSERT INTO Borrower (Roll_no, Name, DateofIssue, NameofBook, Status) VALUES
+(1, 'John Doe', '2024-10-01', 'Introduction to Algorithms', 'I'),
+(2, 'Jane Smith', '2024-09-20', 'Database Systems', 'I'),
+(3, 'Alice Johnson', '2024-10-10', 'Operating Systems Concepts', 'R');
+
+ -- 2. Insert data into Fine Table
+INSERT INTO Fine (Roll_no, Date, Amt) VALUES
+(1, '2024-10-16', 75),
+(2, '2024-10-22', 100);
+
+DELIMITER //
+CREATE PROCEDURE proc_CalculateFine(IN p_Roll_no INT, IN p_NameofBook VARCHAR(255))
+BEGIN
+    DECLARE v_Days INT;
+    DECLARE v_Fine INT DEFAULT 0;
+    DECLARE v_Status CHAR(1);
+
+    -- Exception handler for no data found
+    DECLARE CONTINUE HANDLER FOR NOT FOUND
+    BEGIN
+        SIGNAL SQLSTATE '02000'
+        SET MESSAGE_TEXT = 'No matching record found in Borrower table';
+    END;
+
+    -- Calculate the number of days since the book was issued
+    SELECT DATEDIFF(CURDATE(), DateofIssue), Status INTO v_Days, v_Status 
+    FROM Borrower 
+    WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook;
+
+    IF v_Status = 'I' THEN
+        IF v_Days BETWEEN 15 AND 30 THEN
+            SET v_Fine = v_Days * 5;
+        ELSEIF v_Days > 30 THEN
+            SET v_Fine = v_Days * 50;
+        END IF;
+
+        -- Update status to returned
+        UPDATE Borrower
+        SET Status = 'R'
+        WHERE Roll_no = p_Roll_no AND NameofBook = p_NameofBook;
+
+        -- Insert fine details if applicable
+        IF v_Fine > 0 THEN
+            INSERT INTO Fine (Roll_no, Date, Amt)
+            VALUES (p_Roll_no, CURDATE(), v_Fine);
+        END IF;
+    END IF;
+END //
+DELIMITER ;
+
+SELECT * FROM Borrower;
+
+SELECT * FROM Fine;

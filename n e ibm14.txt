@@ -1,0 +1,45 @@
+CREATE DATABASE CompanyDB;
+
+USE CompanyDB;
+
+CREATE TABLE Employee (
+    employee_id INT PRIMARY KEY,
+    employee_name VARCHAR(100),
+    City VARCHAR(100),
+    Company_Name VARCHAR(100),
+    Salary DECIMAL(10, 2)
+);
+
+INSERT INTO Employee (employee_id, employee_name, City, Company_Name, Salary)
+VALUES 
+(1, 'Alice', 'Pune', 'IBM', 50000),
+(2, 'Bob', 'Mumbai', 'IBM', 45000),
+(3, 'Charlie', 'Bangalore', 'Infosys', 35000),
+(4, 'David', 'Pune', 'Infosys', 32000),
+(5, 'Eve', 'Mumbai', 'IBM', 40000),
+(6, 'Frank', 'Chennai', 'TCS', 38000),
+(7, 'Grace', 'Pune', 'Infosys', 30000),
+(8, 'Hank', 'Delhi', 'Cognizant', 32000),
+(9, 'Ivy', 'Pune', 'IBM', 55000),
+(10, 'Jack', 'Bangalore', 'Wipro', 25000);
+
+SELECT * 
+FROM Employee
+WHERE Company_Name = 'IBM' AND City = 'Pune';
+
+SELECT employee_name, City
+FROM Employee
+WHERE Company_Name = 'Infosys' OR Salary > 30000;
+
+SELECT * 
+FROM Employee
+WHERE Company_Name = 'IBM' AND City != 'Mumbai';
+
+SELECT Company_Name, MAX(Salary) AS Max_Salary
+FROM Employee
+GROUP BY Company_Name;
+
+SELECT Company_Name
+FROM Employee
+GROUP BY Company_Name
+HAVING AVG(Salary) > (SELECT AVG(Salary) FROM Employee WHERE Company_Name = 'IBM');

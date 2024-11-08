@@ -1,0 +1,54 @@
+CREATE DATABASE Edb;
+
+USE Edb;
+
+-- Create Employee table with given schema
+CREATE TABLE Employee (
+    Employee_id INT PRIMARY KEY,
+    First_name VARCHAR(50),
+    Last_name VARCHAR(50),
+    Salary DECIMAL(10, 2),
+    Joining_date DATE,
+    Department VARCHAR(50)
+);
+
+-- Insert sample data into Employee table
+INSERT INTO Employee (Employee_id, First_name, Last_name, Salary, Joining_date, Department) VALUES
+(1, 'Alice', 'Brown', 25000, '2019-02-01', 'IT'),
+(2, 'Bob', 'White', 22000, '2020-06-15', 'HR'),
+(3, 'Carol', 'Black', 28000, '2018-03-22', 'Finance'),
+(4, 'Dave', 'Gray', 18000, '2021-05-10', 'Sales'),
+(5, 'Eve', 'Green', 26000, '2017-07-12', 'Marketing'),
+(6, 'Frank', 'Brown', 29000, '2022-01-30', 'IT'),
+(7, 'Grace', 'White', 15000, '2020-04-19', 'Finance'),
+(8, 'Hank', 'Green', 32000, '2023-08-09', 'HR'),
+(9, 'Ivy', 'Brown', 23000, '2019-11-15', 'Sales'),
+(10, 'Jack', 'Gray', 21000, '2018-09-20', 'Marketing');
+
+-- Queries
+-- 1. Get First_Name, Last_Name
+SELECT First_name, Last_name FROM Employee;
+
+-- 2. Get unique DEPARTMENT
+SELECT DISTINCT Department FROM Employee;
+
+-- 3. Get FIRST_NAME, Joining year, Joining Month, and Joining Date
+SELECT FIRST_NAME, YEAR(Joining_date) AS Joining_Year, MONTH(Joining_date) AS Joining_Month, DAY(Joining_date) AS Joining_Day FROM Employee;
+
+-- 4. Get all employee details ordered by Salary Ascending
+SELECT * FROM Employee ORDER BY Salary ASC;
+
+-- 5. Get all employee details whose First_Name starts with 'A'
+SELECT * FROM Employee WHERE First_name LIKE 'A%';
+
+-- 6. Update Salary by incrementing salary of employees with less than 20000 by 5000
+UPDATE Employee SET Salary = Salary + 5000 WHERE Salary < 20000;
+
+-- 7. Delete the department of employee no 004
+UPDATE Employee SET Department = NULL WHERE Employee_id = 4;
+
+-- 8. Find department-wise minimum salary
+SELECT Department, MIN(Salary) AS Min_Salary FROM Employee GROUP BY Department;
+
+-- 9. Find department-wise average salary in ascending order
+SELECT Department, AVG(Salary) AS Avg_Salary FROM Employee GROUP BY Department ORDER BY Avg_Salary ASC;

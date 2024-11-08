@@ -1,0 +1,76 @@
+CREATE DATABASE db;
+
+USE db;
+
+-- Employee Table
+CREATE TABLE Employee (
+    Employee_id INT PRIMARY KEY,
+    First_name VARCHAR(50),
+    Last_name VARCHAR(50),
+    Hire_date DATE,
+    Salary DECIMAL(10, 2),
+    Job_title VARCHAR(50),
+    Manager_id INT,
+    Department_id INT
+);
+
+-- Departments Table
+CREATE TABLE Departments (
+    Department_id INT PRIMARY KEY,
+    Department_name VARCHAR(50),
+    Manager_id INT,
+    Location_id INT
+);
+
+-- Locations Table
+CREATE TABLE Locations (
+    Location_id INT PRIMARY KEY,
+    Street_address VARCHAR(100),
+    Postal_code VARCHAR(20),
+    City VARCHAR(50),
+    State VARCHAR(50),
+    Country_id CHAR(2)
+);
+
+-- Sample Data for Employee Table
+INSERT INTO Employee (Employee_id, First_name, Last_name, Hire_date, Salary, Job_title, Manager_id, Department_id) VALUES
+(1, 'John', 'Smith', '2018-01-15', 55000, 'Analyst', NULL, 101),
+(2, 'Alice', 'Johnson', '2019-03-10', 60000, 'Manager', 1, 102),
+(3, 'Bob', 'Singh', '2020-05-20', 45000, 'Developer', 1, 101),
+(4, 'Carol', 'Brown', '2019-11-08', 70000, 'Developer', 2, 103);
+
+-- Sample Data for Departments Table
+INSERT INTO Departments (Department_id, Department_name, Manager_id, Location_id) VALUES
+(101, 'IT', 1, 1),
+(102, 'HR', 2, 2),
+(103, 'Finance', NULL, 3);
+
+-- Sample Data for Locations Table
+INSERT INTO Locations (Location_id, Street_address, Postal_code, City, State, Country_id) VALUES
+(1, '123 First St', '10001', 'New York', 'NY', 'US'),
+(2, '456 Second St', '90001', 'Los Angeles', 'CA', 'US'),
+(3, '789 Third St', '20001', 'Washington', 'DC', 'US');
+
+SELECT e1.First_name, e1.Last_name, e1.Salary
+FROM Employee e1
+JOIN Employee e2 ON e2.Last_name = 'Singh'
+WHERE e1.Salary > e2.Salary;
+
+SELECT e.First_name, e.Last_name
+FROM Employee e
+JOIN Departments d ON e.Department_id = d.Department_id
+JOIN Locations l ON d.Location_id = l.Location_id
+WHERE l.Country_id = 'US' AND e.Manager_id IS NOT NULL;
+
+SELECT First_name, Last_name
+FROM Employee
+WHERE Department_id = (SELECT Department_id FROM Departments WHERE Department_name = 'IT');
+
+SELECT First_name, Last_name, Salary
+FROM Employee
+WHERE Salary > (SELECT AVG(Salary) FROM Employee);
+
+SELECT First_name, Last_name, Salary
+FROM Employee
+WHERE Salary > (SELECT AVG(Salary) FROM Employee)
+  AND Department_id = (SELECT Department_id FROM Departments WHERE Department_name = 'IT');

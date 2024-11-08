@@ -1,0 +1,52 @@
+use OrdersDB;
+
+db.createCollection("orders");
+
+db.orders.insertMany([
+  { cus_id: "A1", amount: 400, status: "P" },
+  { cus_id: "B1", amount: 300, status: "D" },
+  { cus_id: "A1", amount: 200, status: "F" },
+  { cus_id: "C1", amount: 200, status: "F" },
+  { cus_id: "B1", amount: 700, status: "P" },
+  { cus_id: "B1", amount: 800, status: "P" }
+]);
+
+db.orders.mapReduce(
+  function() {
+    if (this.status === 'P') emit(this.cus_id, this.amount);
+  },
+  function(key, values) {
+    return Array.sum(values);
+  },
+  { out: "sum_of_amount_pending" }
+);
+
+db.orders.mapReduce(
+  function() {
+    emit(this.cus_id, this.amount);
+  },
+  function(key, values) {
+    return Array.avg(values);
+  },
+  { out: "avg_amount_each_customer" }
+);
+
+db.orders.mapReduce(
+  function() {
+    emit(this.cus_id, this.amount);
+  },
+  function(key, values) {
+    return Math.min.apply(Math, values);
+  },
+  { out: "min_amount_each_customer" }
+);
+
+db.orders.mapReduce(
+  function() {
+    if (this.status === 'F') emit(this.cus_id, this.amount);
+  },
+  function(key, values) {
+    return Array.sum(values);
+  },
+  { out: "sum_amount_status_F" }
+);
